@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathMind: Puzzle Challenge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --white: #ffffff;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .game-container {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+            transform: translateY(0);
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .game-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        .game-header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: var(--white);
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .game-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .game-header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .game-content {
+            padding: 30px;
+        }
+        
+        .screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            text-align: center;
+        }
+        
+        .btn {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            margin: 10px 5px;
+            min-width: 150px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn.easy {
+            background-color: #4cc9f0;
+        }
+        
+        .btn.easy:hover {
+            background-color: #3ab5dc;
+        }
+        
+        .btn.medium {
+            background-color: #f8961e;
+        }
+        
+        .btn.medium:hover {
+            background-color: #e08615;
+        }
+        
+        .btn.hard {
+            background-color: #f72585;
+        }
+        
+        .btn.hard:hover {
+            background-color: #e51575;
+        }
+        
+        .btn.secondary {
+            background-color: var(--light);
+            color: var(--dark);
+        }
+        
+        .btn.secondary:hover {
+            background-color: #e9ecef;
+        }
+        
+        .btn.hint {
+            background-color: #7209b7;
+            min-width: 100px;
+        }
+        
+        .btn.hint:hover {
+            background-color: #5a0891;
+        }
+        
+        .puzzle {
+            background-color: var(--light);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin: 20px 0;
+            width: 100%;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+        
+        .puzzle-line {
+            margin: 10px 0;
+        }
+        
+        .answer-input {
+            font-size: 1.2rem;
+            padding: 12px 15px;
+            width: 120px;
+            text-align: center;
+            margin: 15px 0;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            font-weight: 600;
+        }
+        
+        .answer-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .feedback {
+            font-size: 1.1rem;
+            margin: 15px 0;
+            min-height: 24px;
+            font-weight: 500;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            width: 100%;
+        }
+        
+        .hint-text {
+            font-size: 1rem;
+            color: #7209b7;
+            background-color: #f3e5ff;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .correct {
+            color: #2b8a3e;
+            background-color: #ebfbee;
+        }
+        
+        .incorrect {
+            color: #c92a2a;
+            background-color: #fff5f5;
+        }
+        
+        .score-display {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .score-icon {
+            margin-right: 8px;
+            font-size: 1.3rem;
+        }
+        
+        .difficulty-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .animated {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .sound-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--gray);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @media (max-width: 576px) {
+            .game-content {
+                padding: 20px;
+            }
+            
+            .btn {
+                padding: 10px 15px;
+                min-width: 120px;
+                font-size: 0.9rem;
+            }
+            
+            .puzzle {
+                font-size: 1.3rem;
+                padding: 15px;
+            }
+            
+            .answer-input {
+                font-size: 1.1rem;
+                width: 100px;
+            }
+            
+            .sound-toggle {
+                top: 10px;
+                right: 10px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sound-toggle" id="sound-toggle" title="Toggle sound">🔊</button>
+    
+    <div class="game-container animated">
+        <div class="game-header">
+            <h1>MathMind</h1>
+            <p>Challenge your problem-solving skills</p>
+        </div>
+        
+        <div class="game-content">
+            <!-- Start Screen -->
+            <div id="start-screen" class="screen">
+                <div style="margin-bottom: 30px;">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 15px;">
+                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8 14C8 14 9.5 16 12 16C14.5 16 16 14 16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M9 9H9.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M15 9H15.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <h2 style="margin-bottom: 10px;">Puzzle Challenge</h2>
+                    <p style="color: var(--gray);">Solve math puzzles at different difficulty levels and improve your skills!</p>
+                </div>
+                <button class="btn" id="start-btn">Start Game</button>
+            </div>
+            
+            <!-- Difficulty Selection Screen -->
+            <div id="difficulty-screen" class="screen hidden">
+                <h2 style="margin-bottom: 20px;">Select Difficulty</h2>
+                <p style="color: var(--gray); margin-bottom: 25px;">Choose your challenge level</p>
+                
+                <div class="difficulty-container">
+                    <button class="btn easy" data-difficulty="easy">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+                            <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.709 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18455 2.99721 7.13631 4.39828 5.49706C5.79935 3.85781 7.69279 2.71537 9.79619 2.24013C11.8996 1.7649 14.1003 1.98232 16.07 2.86" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Easy
+                    </button>
+                    <button class="btn medium" data-difficulty="medium">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+                            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 8V12L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Medium
+                    </button>
+                    <button class="btn hard" data-difficulty="hard">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+                            <path d="M19 14C19 14.5304 18.7893 15.0391 18.4142 15.4142C18.0391 15.7893 17.5304 16 17 16H7L3 20V7C3 6.46957 3.21071 5.96086 3.58579 5.58579C3.96086 5.21071 4.46957 5 5 5H17C17.5304 5 18.0391 5.21071 18.4142 5.58579C18.7893 5.96086 19 6.46957 19 7V14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 11V11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8 11V11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 11V11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Hard
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Game Screen -->
+            <div id="game-screen" class="screen hidden">
+                <div class="puzzle" id="puzzle">
+                    <!-- Puzzle will be displayed here -->
+                </div>
+                
+                <div id="hint-text" class="hint-text"></div>
+                
+                <input type="number" class="answer-input" id="answer-input" placeholder="?" autofocus>
+                
+                <div class="feedback" id="feedback"></div>
+                
+                <div class="btn-group">
+                    <button class="btn hint" id="hint-btn">Hint</button>
+                    <button class="btn" id="check-btn">Check Answer</button>
+                    <button class="btn secondary hidden" id="next-btn">Next Puzzle</button>
+                </div>
+                
+                <div class="score-display" id="score">
+                    <svg class="score-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8 14C8 14 9.5 16 12 16C14.5 16 16 14 16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M9 9H9.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M15 9H15.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Score: <span id="score-value">0</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game variables
+        let currentPuzzle = null;
+        let correctAnswer = null;
+        let score = 0;
+        let difficulty = 'easy';
+        let soundEnabled = true;
+        let hintUsed = false;
+        
+        // DOM elements
+        const startScreen = document.getElementById('start-screen');
+        const difficultyScreen = document.getElementById('difficulty-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const puzzleElement = document.getElementById('puzzle');
+        const answerInput = document.getElementById('answer-input');
+        const feedbackElement = document.getElementById('feedback');
+        const checkBtn = document.getElementById('check-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const hintBtn = document.getElementById('hint-btn');
+        const hintText = document.getElementById('hint-text');
+        const scoreElement = document.getElementById('score-value');
+        const startBtn = document.getElementById('start-btn');
+        const difficultyBtns = document.querySelectorAll('[data-difficulty]');
+        const soundToggle = document.getElementById('sound-toggle');
+        
+        // Sound effects
+        const sounds = {
+            click: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...'), // Short click sound
+            correct: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...'), // Correct answer sound
+            wrong: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...'), // Wrong answer sound
+            success: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...'), // Success sound
+            button: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...'), // Button press sound
+            hint: new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...') // Hint sound
+        };
+        
+        // Initialize sound objects
+        Object.values(sounds).forEach(sound => {
+            sound.volume = 0.3;
+        });
+        
+        // Event listeners
+        startBtn.addEventListener('click', () => {
+            playSound('button');
+            startScreen.classList.add('hidden');
+            difficultyScreen.classList.remove('hidden');
+            animateScreen(difficultyScreen);
+        });
+        
+        difficultyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                playSound('button');
+                difficulty = btn.dataset.difficulty;
+                difficultyScreen.classList.add('hidden');
+                gameScreen.classList.remove('hidden');
+                animateScreen(gameScreen);
+                resetGame();
+                generatePuzzle();
+            });
+        });
+        
+        checkBtn.addEventListener('click', checkAnswer);
+        nextBtn.addEventListener('click', () => {
+            playSound('button');
+            generatePuzzle();
+        });
+        answerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                playSound('click');
+                checkAnswer();
+            }
+        });
+        
+        hintBtn.addEventListener('click', showHint);
+        
+        soundToggle.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            soundToggle.textContent = soundEnabled ? '🔊' : '🔇';
+            playSound('click');
+        });
+        
+        // Play sound function
+        function playSound(type) {
+            if (!soundEnabled) return;
+            
+            try {
+                sounds[type].currentTime = 0; // Rewind to start
+                sounds[type].play();
+            } catch (e) {
+                console.log("Sound error:", e);
+            }
+        }
+        
+        // Show hint for the current puzzle
+        function showHint() {
+            playSound('hint');
+            hintUsed = true;
+            
+            if (!currentPuzzle || !currentPuzzle.hint) {
+                // Generate hint if not already available
+                currentPuzzle.hint = generateHint(currentPuzzle);
+            }
+            
+            hintText.textContent = currentPuzzle.hint;
+            hintText.style.display = 'block';
+            
+            // Disable hint button after use
+            hintBtn.disabled = true;
+            hintBtn.style.opacity = '0.6';
+        }
+        
+        // Generate hint based on puzzle type
+        function generateHint(puzzle) {
+            if (!puzzle) return "No hint available for this puzzle.";
+            
+            // Extract numbers from puzzle display for hints
+            const numbers = puzzle.display.match(/\d+/g) || [];
+            
+            switch(difficulty) {
+                case 'easy':
+                    if (puzzle.display.includes('+')) {
+                        return `Try adding ${numbers[0]} and ${numbers[1]}`;
+                    } else if (puzzle.display.includes('-')) {
+                        return `Try subtracting ${numbers[1]} from ${numbers[0]}`;
+                    }
+                    break;
+                    
+                case 'medium':
+                    if (puzzle.display.includes('×')) {
+                        return `Multiply ${numbers[0]} by ${numbers[1]}`;
+                    } else if (puzzle.display.includes('÷')) {
+                        return `Divide ${numbers[0]} by ${numbers[1]}`;
+                    }
+                    break;
+                    
+                case 'hard':
+                    if (puzzle.display.includes('%')) {
+                        return `If ${numbers[0]}% of a number is ${numbers[1]}, the number is ${numbers[1]} ÷ (${numbers[0]} ÷ 100)`;
+                    } else if (puzzle.display.includes('÷')) {
+                        const fractionParts = puzzle.display.match(/(\d+)\/(\d+)/);
+                        if (fractionParts) {
+                            return `First calculate 1 - ${fractionParts[1]}/${fractionParts[2]}, then divide the first number by that result`;
+                        }
+                    } else if (puzzle.display.includes('×')) {
+                        return `Remember the order of operations - multiplication comes before addition`;
+                    }
+                    break;
+            }
+            
+            return "Think step by step to solve this puzzle";
+        }
+        
+        // Animation helper
+        function animateScreen(element) {
+            element.classList.remove('animated');
+            void element.offsetWidth; // Trigger reflow
+            element.classList.add('animated');
+        }
+        
+        // Reset game state
+        function resetGame() {
+            score = 0;
+            scoreElement.textContent = score;
+            hintUsed = false;
+        }
+        
+        // Puzzle generation
+        function generatePuzzle() {
+            // Reset UI for new puzzle
+            answerInput.value = '';
+            feedbackElement.textContent = '';
+            feedbackElement.className = 'feedback';
+            checkBtn.classList.remove('hidden');
+            nextBtn.classList.add('hidden');
+            answerInput.disabled = false;
+            answerInput.focus();
+            hintText.style.display = 'none';
+            hintBtn.disabled = false;
+            hintBtn.style.opacity = '1';
+            hintUsed = false;
+            
+            // Generate puzzle based on difficulty
+            switch(difficulty) {
+                case 'easy':
+                    currentPuzzle = generateEasyPuzzle();
+                    break;
+                case 'medium':
+                    currentPuzzle = generateMediumPuzzle();
+                    break;
+                case 'hard':
+                    currentPuzzle = generateHardPuzzle();
+                    break;
+                default:
+                    currentPuzzle = generateEasyPuzzle();
+            }
+            
+            // Display the puzzle
+            puzzleElement.innerHTML = currentPuzzle.display;
+            correctAnswer = currentPuzzle.answer;
+        }
+        
+        function generateEasyPuzzle() {
+            // Simple addition/subtraction puzzles
+            const num1 = Math.floor(Math.random() * 20) + 5;
+            const num2 = Math.floor(Math.random() * 20) + 5;
+            const operations = ['+', '-'];
+            const op = operations[Math.floor(Math.random() * operations.length)];
+            
+            let answer, display;
+            
+            if (op === '+') {
+                answer = num1 + num2;
+                display = `<div class="puzzle-line">${num1} ${op} ${num2} = ?</div>`;
+            } else {
+                // Ensure positive result for subtraction
+                answer = num1 - num2;
+                display = `<div class="puzzle-line">${num1 + num2} ${op} ${num2} = ?</div>`;
+            }
+            
+            return { display, answer };
+        }
+        
+        function generateMediumPuzzle() {
+            // Multiplication/division puzzles
+            const num1 = Math.floor(Math.random() * 12) + 2;
+            const num2 = Math.floor(Math.random() * 12) + 2;
+            const operations = ['×', '÷'];
+            const op = operations[Math.floor(Math.random() * operations.length)];
+            
+            let answer, display;
+            
+            if (op === '×') {
+                answer = num1 * num2;
+                display = `<div class="puzzle-line">${num1} ${op} ${num2} = ?</div>`;
+            } else {
+                answer = num1;
+                display = `<div class="puzzle-line">${num1 * num2} ${op} ${num2} = ?</div>`;
+            }
+            
+            return { display, answer };
+        }
+        
+        function generateHardPuzzle() {
+            // Multi-step problems like in the example
+            const types = ['fraction', 'percentage', 'multi-step'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            
+            if (type === 'fraction') {
+                // Similar to the example in the image
+                const denominator = Math.floor(Math.random() * 4) + 2; // 2-5
+                const numerator = Math.floor(Math.random() * (denominator - 1)) + 1; // 1 to denominator-1
+                
+                const wholeNumber = Math.floor(Math.random() * 10) + 10; // 10-19
+                const answer = wholeNumber * denominator / (denominator - numerator);
+                
+                const display = `
+                    <div class="puzzle-line">${wholeNumber} ÷ (1 - ${numerator}/${denominator}) = ?</div>
+                `;
+                
+                return { display, answer: Math.round(answer) };
+            } else if (type === 'percentage') {
+                // Percentage problem
+                const percentage = (Math.floor(Math.random() * 9) + 1) * 10; // 10%-90%
+                const result = Math.floor(Math.random() * 50) + 10; // 10-59
+                const answer = result * 100 / percentage;
+                
+                const display = `
+                    <div class="puzzle-line">${percentage}% of ? = ${result}</div>
+                `;
+                
+                return { display, answer: Math.round(answer) };
+            } else {
+                // Multi-step problem
+                const num1 = Math.floor(Math.random() * 10) + 5;
+                const num2 = Math.floor(Math.random() * 5) + 2;
+                const num3 = Math.floor(Math.random() * 5) + 2;
+                
+                const answer = (num1 * num2) + (num1 * num3);
+                const display = `
+                    <div class="puzzle-line">${num1} × ${num2} + ${num1} × ${num3} = ?</div>
+                `;
+                
+                return { display, answer };
+            }
+        }
+        
+        // Check the user's answer
+        function checkAnswer() {
+            const userAnswer = parseFloat(answerInput.value);
+            
+            if (isNaN(userAnswer)) {
+                feedbackElement.textContent = 'Please enter a valid number';
+                feedbackElement.className = 'feedback incorrect';
+                playSound('wrong');
+                return;
+            }
+            
+            // Round both answers to handle floating point precision
+            const roundedUserAnswer = Math.round(userAnswer * 100) / 100;
+            const roundedCorrectAnswer = Math.round(correctAnswer * 100) / 100;
+            
+            if (roundedUserAnswer === roundedCorrectAnswer) {
+                feedbackElement.textContent = 'Correct! Well done! 🎉';
+                feedbackElement.className = 'feedback correct';
+                
+                // Reduce score gain if hint was used
+                score += hintUsed ? 0.5 : 1;
+                scoreElement.textContent = Math.floor(score);
+                
+                playSound('correct');
+                
+                // Animate score update
+                const scoreDisplay = document.getElementById('score');
+                scoreDisplay.classList.remove('animated');
+                void scoreDisplay.offsetWidth;
+                scoreDisplay.classList.add('animated');
+            } else {
+                feedbackElement.textContent = `Incorrect. The correct answer is ${correctAnswer}.`;
+                feedbackElement.className = 'feedback incorrect';
+                playSound('wrong');
+            }
+            
+            checkBtn.classList.add('hidden');
+            nextBtn.classList.remove('hidden');
+            answerInput.disabled = true;
+        }
+    </script>
+</body>
+</html>
